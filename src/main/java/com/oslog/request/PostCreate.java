@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @ToString
 @Builder
+@AllArgsConstructor
 public class PostCreate {
 
     @NotBlank(message = "타이틀을 입력해주세요.")
