@@ -3,22 +3,21 @@ package com.oslog.service;
 import com.oslog.domain.Post;
 import com.oslog.repository.PostRepository;
 import com.oslog.request.PostCreate;
+import com.oslog.request.PostEdit;
+import com.oslog.request.PostSearch;
 import com.oslog.response.PostResponse;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringBootTest
@@ -48,10 +47,10 @@ class PostServiceTest {
         postService.write(postCreate);
 
         // then
-        Assertions.assertEquals(1L, postRepository.count());
+        assertEquals(1L, postRepository.count());
         Post post = postRepository.findAll().get(0);
-        Assertions.assertEquals("제목입니다.", post.getTitle());
-        Assertions.assertEquals("내용입니다.", post.getContent());
+        assertEquals("제목입니다.", post.getTitle());
+        assertEquals("내용입니다.", post.getContent());
     }
 
     @Test
@@ -69,8 +68,8 @@ class PostServiceTest {
 
         // then
         assertNotNull(postResponse);
-        Assertions.assertEquals("foo", postResponse.getTitle());
-        Assertions.assertEquals("bar", postResponse.getContent());
+        assertEquals("foo", postResponse.getTitle());
+        assertEquals("bar", postResponse.getContent());
     }
 
     @Test
@@ -84,16 +83,68 @@ class PostServiceTest {
                         .build())
                 .collect(Collectors.toList());
         postRepository.saveAll(requestPosts);
-        Pageable pageable = PageRequest.of(0, 5, DESC, "id");
+        PostSearch postSearch = PostSearch.builder().build();
 
         // when
-        List<PostResponse> posts = postService.getList(pageable);
+        List<PostResponse> posts = postService.getList(postSearch);
 
         // then
         assertNotNull(posts);
-        Assertions.assertEquals(5L, posts.size());
-        Assertions.assertEquals("오스카 제목 - 30", posts.get(0).getTitle());
-        Assertions.assertEquals("오스카 제목 - 26", posts.get(4).getTitle());
+        assertEquals(10L, posts.size());
+        assertEquals("오스카 제목 - 30", posts.get(0).getTitle());
+        assertEquals("오스카 제목 - 26", posts.get(4).getTitle());
+    }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    void editPostTitle() {
+        // given
+        Post post = Post.builder()
+                .title("오스카")
+                .content("아크자이")
+                .build();
+
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("양라솔")
+                .content("아크자이")
+                .build();
+
+        // when
+        postService.edit(post.getId(), postEdit);
+
+        // then
+        Post changePost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id=" + post.getId()));
+
+        assertEquals("양라솔", changePost.getTitle());
+    }
+
+    @Test
+    @DisplayName("글 내용 수정")
+    void editPostContent() {
+        // given
+        Post post = Post.builder()
+                .title("오스카")
+                .content("아크자이")
+                .build();
+
+        postRepository.save(post);
+
+        PostEdit postEdit = PostEdit.builder()
+                .title("오스카")
+                .content("반포자이")
+                .build();
+
+        // when
+        postService.edit(post.getId(), postEdit);
+
+        // then
+        Post changePost = postRepository.findById(post.getId())
+                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id=" + post.getId()));
+
+        assertEquals("반포자이", changePost.getContent());
     }
 
 }
