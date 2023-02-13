@@ -1,6 +1,7 @@
 package com.oslog.service;
 
 import com.oslog.domain.Post;
+import com.oslog.exception.PostNotFound;
 import com.oslog.repository.PostRepository;
 import com.oslog.request.PostCreate;
 import com.oslog.request.PostEdit;
@@ -18,6 +19,7 @@ import java.util.stream.IntStream;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest
@@ -116,7 +118,7 @@ class PostServiceTest {
 
         // then
         Post changePost = postRepository.findById(post.getId())
-                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id=" + post.getId()));
+                .orElseThrow(PostNotFound::new);
 
         assertEquals("양라솔", changePost.getTitle());
     }
@@ -142,9 +144,43 @@ class PostServiceTest {
 
         // then
         Post changePost = postRepository.findById(post.getId())
-                .orElseThrow(() -> new RuntimeException("글이 존재하지 않습니다. id=" + post.getId()));
+                .orElseThrow(PostNotFound::new);
 
         assertEquals("반포자이", changePost.getContent());
+    }
+
+    @Test
+    @DisplayName("글 내용 삭제")
+    void deletePostContent() {
+        // given
+        Post post = Post.builder()
+                .title("오스카")
+                .content("아크자이")
+                .build();
+
+        postRepository.save(post);
+
+        // when
+        postService.delete(post.getId());
+
+        // then
+        assertEquals(0, postRepository.count());
+    }
+
+    @Test
+    @DisplayName("글 1페이지 조회 에러 케이스")
+    void selectPostListWithFailCase() {
+        // given
+        Post requestPost = Post.builder()
+                .title("오스카")
+                .content("아크자이")
+                .build();
+        postRepository.save(requestPost);
+
+        // when
+        assertThrows(PostNotFound.class, () -> {
+            postService.get(requestPost.getId() + 1L);
+        });
     }
 
 }

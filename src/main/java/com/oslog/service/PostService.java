@@ -2,6 +2,7 @@ package com.oslog.service;
 
 import com.oslog.domain.Post;
 import com.oslog.domain.PostEditor;
+import com.oslog.exception.PostNotFound;
 import com.oslog.repository.PostRepository;
 import com.oslog.request.PostCreate;
 import com.oslog.request.PostEdit;
@@ -32,7 +33,8 @@ public class PostService {
 
     public PostResponse get(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
+
         return PostResponse.builder()
                     .id(post.getId())
                     .title(post.getTitle())
@@ -47,9 +49,9 @@ public class PostService {
     }
 
     @Transactional
-    public void edit(Long id, PostEdit postEdit){
+    public void edit(Long id, PostEdit postEdit) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글입니다."));
+                .orElseThrow(PostNotFound::new);
 
         PostEditor.PostEditorBuilder editorBuilder = post.toEditor();
 
@@ -61,5 +63,10 @@ public class PostService {
         post.edit(postEditor);
 
         postRepository.save(post);
+    }
+
+    public void delete(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(PostNotFound::new);
+        postRepository.delete(post);
     }
 }
