@@ -11,7 +11,7 @@ public class InvalidRequest extends OslogException{
         addValidation(fieldName, message);
     }
 
-    public String getStatusCode() {
-        return "400";
+    public int getStatusCode() {
+        return 400;
     }
 }

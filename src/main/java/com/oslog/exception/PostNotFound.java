@@ -9,7 +9,7 @@ public class PostNotFound extends OslogException{
     }
 
     @Override
-    public String getStatusCode() {
-        return "404";
+    public int getStatusCode() {
+        return 404;
     }
 }

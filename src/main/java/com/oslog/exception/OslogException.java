@@ -18,7 +18,7 @@ public abstract class OslogException extends RuntimeException {
         super(message, cause);
     }
 
-    public abstract String getStatusCode();
+    public abstract int getStatusCode();
 
     public void addValidation(String fieldName, String message) {
         validaton.put(fieldName, message);

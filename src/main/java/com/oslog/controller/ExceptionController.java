@@ -34,15 +34,13 @@ public class ExceptionController {
     @ExceptionHandler(OslogException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> oslogException(OslogException e) {
-        String statusCode = e.getStatusCode();
+        int statusCode = e.getStatusCode();
         ErrorResponse body = ErrorResponse.builder()
-                .code(statusCode)
+                .code(String.valueOf(statusCode))
                 .message(e.getMessage())
                 .validation(e.getValidaton())
                 .build();
 
-        ResponseEntity<ErrorResponse> response = ResponseEntity.status(Integer.parseInt(statusCode)).body(body);
-
-        return response;
+        return ResponseEntity.status(statusCode).body(body);
     }
 }

@@ -1,0 +1,39 @@
+= Oslog API
+:doctype: book
+:icons: front
+:source-highlighter: highlightsjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== 글 단건조회
+
+=== 요청
+
+include::{snippets}/post-inquiry/http-request.adoc[]
+
+=== 요청 파라미터
+
+include::{snippets}/post-inquiry/path-parameters.adoc[]
+
+=== 응답
+
+include::{snippets}/post-inquiry/http-response.adoc[]
+
+=== 응답 필드
+
+include::{snippets}/post-inquiry/response-fields.adoc[]
+
+== 글 작성
+
+=== 요청
+
+include::{snippets}/post-create/http-request.adoc[]
+
+=== 요청 필드
+
+include::{snippets}/post-create/request-fields.adoc[]
+
+=== 응답
+
+include::{snippets}/post-create/http-response.adoc[]

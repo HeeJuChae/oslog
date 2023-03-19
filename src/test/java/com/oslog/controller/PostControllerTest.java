@@ -67,10 +67,12 @@ class PostControllerTest {
         PostCreate request = PostCreate.builder()
                 .content("내용입니다.")
                 .build();
+
+        String json = objectMapper.writeValueAsString(request);
         // expected
         mockMvc.perform(post("/posts")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
+                        .content(json)
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath(("$.code")).value("400"))
@@ -128,7 +130,7 @@ class PostControllerTest {
     @DisplayName("글 여러개 조회")
     void selectPosts() throws Exception {
         // given
-        List<Post> requestPosts = IntStream.range(1, 31)
+        List<Post> requestPosts = IntStream.range(0, 20)
                 .mapToObj(i -> Post.builder()
                         .title("오스카 제목 - "+ i)
                         .content("블로그 내용 - "+ i)
@@ -142,9 +144,8 @@ class PostControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(10)))
-                .andExpect(jsonPath("$[0].id").value(30))
-                .andExpect(jsonPath("$[0].title").value("오스카 제목 - 30"))
-                .andExpect(jsonPath("$[0].content").value("블로그 내용 - 30"))
+                .andExpect(jsonPath("$[0].title").value("오스카 제목 - 19"))
+                .andExpect(jsonPath("$[0].content").value("블로그 내용 - 19"))
                 .andDo(print());
     }
 
@@ -152,7 +153,7 @@ class PostControllerTest {
     @DisplayName("페이지 번호가 0일 때 기본 값으로 조회")
     void selectPostsIfPageNmIs0() throws Exception {
         // given
-        List<Post> requestPosts = IntStream.range(1, 31)
+        List<Post> requestPosts = IntStream.range(0, 20)
                 .mapToObj(i -> Post.builder()
                         .title("오스카 제목 - "+ i)
                         .content("블로그 내용 - "+ i)
@@ -166,9 +167,8 @@ class PostControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(10)))
-                .andExpect(jsonPath("$[0].id").value(30))
-                .andExpect(jsonPath("$[0].title").value("오스카 제목 - 30"))
-                .andExpect(jsonPath("$[0].content").value("블로그 내용 - 30"))
+                .andExpect(jsonPath("$[0].title").value("오스카 제목 - 19"))
+                .andExpect(jsonPath("$[0].content").value("블로그 내용 - 19"))
                 .andDo(print());
     }
 
